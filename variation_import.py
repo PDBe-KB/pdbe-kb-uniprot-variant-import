@@ -16,12 +16,14 @@ class VariationImport(object):
         self.data = data
         self.unp_variant_csv_path = './UNP_Variant.csv'
         self.xref_csv_path = './UNP_Variant_Xref.csv'
+        self.evidence_csv_path = './UNP_Variant_Evidence.csv'
         self.xref_keys = ['name', 'id', 'url', 'alternativeUrl']
         self.unp_variant_keys = ['type', 'description', 'alternativeSequence',
                                  'begin', 'end', 'wildType', 'polyphenPrediction',
                                  'polyphenScore', 'siftPrediction', 'siftScore',
                                  'somaticStatus', 'cytogeneticBand', 'consequenceType',
                                  'genomicLocation', 'clinicalSignificances', 'sourceType']
+        self.evidence_keys = ['code', 'name', 'id', 'url', 'alternativeUrl']
 
     def clean_up(self):
         os.system('rm %s' % self.unp_variant_csv_path)
@@ -29,16 +31,27 @@ class VariationImport(object):
     def run(self):
         accession = self.data['accession']
         feature_count = 0
+        xref_count = 0
+        evidences_count = 0
         for feature in self.data['features']:
             feature_count += 1
             variant_id = '%s_%s' % (accession, feature_count)
             self.save_to_file(feature, variant_id, self.unp_variant_keys, self.unp_variant_csv_path)
             if 'xrefs' in feature.keys():
-                xref_count = 0
                 for xref in feature['xrefs']:
                     xref_count += 1
                     xref_id = '%s_%s' % (variant_id, xref_count)
                     self.save_to_file(xref, xref_id, self.xref_keys, self.xref_csv_path)
+            if 'evidences' in feature.keys():
+                for evidence in feature['evidences']:
+                    evidences_count += 1
+                    evidence_id = '%s_%s' % (accession, evidences_count)
+                    print(evidence_id)
+                    flat_evidence = {}
+                    if 'source' in evidence.keys():
+                        flat_evidence = evidence['source']
+                    flat_evidence['code'] = self.value_or_null(evidence, 'code')
+                    self.save_to_file(flat_evidence, evidence_id, self.evidence_keys, self.evidence_csv_path)
 
     def save_to_file(self, data, identifier, keyList, csvPath):
         csvFile = open(csvPath, 'a')
