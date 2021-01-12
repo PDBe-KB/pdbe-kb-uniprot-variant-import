@@ -1,14 +1,71 @@
 import json
 import os
+import glob
+import csv
 
-#  TODO change later
-with open('./sample.json') as sampleJson:
-    sampleData = json.load(sampleJson)
+# TODO need to cleanup old .csv files
+
+SIFTS_URL_TO_MAPPING = 'ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/uniprot_pdb.tsv.gz'
+
+def main():
+    """
+    Get the latest UniProt mapping from SIFTS and
+    retrieve all the JSONs with the variation data
+    """
+    gd = GetData(SIFTS_URL_TO_MAPPING)
+    gd.make_folder()
+    gd.get_file()
+    gd.extract()
+    gd.get_jsons()
+
+    """
+    Convert the variation data JSONs files to
+    CSV files for loading into PDBe-KB graph
+    database
+    """
+    for json_path in glob.glob('data/*.json'):
+        with open(json_path) as json_file:
+            try:
+                data = json.load(json_file)
+                vi = VariationImport(data)
+                vi.run()
+            except:
+                continue
+            
+
+class GetData(object):
+
+    def __init__(self, url):
+        self.url = url
+        self.mapping_file_name = 'uniprot.tsv'
+
+    def make_folder(self):
+        os.system('mkdir data')
+
+    def get_file(self):
+        print('Getting latest SIFTS mapping file...')
+        os.system('curl %s > %s.gz' % (self.url, self.mapping_file_name))
+
+    def extract(self):
+        print('Extracting mapping file...')
+        os.system('gunzip %s.gz' % self.mapping_file_name)
+
+    def get_jsons(self):
+        with open(self.mapping_file_name) as mapping_file:
+            line_count = 0
+            for line in mapping_file:
+                if not line.startswith('#') and not line.startswith('SP_PRIMARY'):
+                    line_count += 1
+                    accession = line.split()[0]
+                    os.system('curl -s https://www.ebi.ac.uk/proteins/api/variation/%s > data/%s.json' % (
+                        accession.strip(),
+                        accession.strip()))
+                    if line_count % 1000 == 0:
+                        print('Retrieved %i JSONs' % line_count)
 
 
 class VariationImport(object):
-    # TODO add path to UniProt mapping file or make query to DB
-    # TODO change later the data input
+    # TODO add progress % output
 
     def __init__(self, data):
         self.data = data
@@ -32,7 +89,8 @@ class VariationImport(object):
         self.association_keys = ['name', 'description', 'disease']
 
     def run(self):
-        self.clean_up()
+        if 'accession' not in self.data.keys():
+            return None
         accession = self.data['accession']
         feature_count = 0
         xref_count = 0
@@ -84,24 +142,25 @@ class VariationImport(object):
 
     def save_to_file(self, data, identifier, key_list, csv_path):
         csv_file = open(csv_path, 'a')
-        csv_file.write(identifier)
+        csv_writer = csv.writer(csv_file, dialect='excel')
+        row = [identifier]
         for key in key_list:
-            csv_file.write(';%s' % self.value_or_null(data, key))
-        csv_file.write('\n')
+            row.append(self.value_or_null(data, key))
+        csv_writer.writerow(row)
         csv_file.close()
 
     def save_to_rels_file(self, x, y, csv_path):
         csv_file = open(csv_path, 'a')
-        csv_file.write('%s;%s\n' % (x, y))
+        csv_writer = csv.writer(csv_file, dialect='excel')
+        csv_writer.writerow((x, y))
         csv_file.close()
 
     def value_or_null(self, data, key):
         if data and key in data.keys():
+            if type(data[key]) is unicode:
+                data[key] = data[key].encode('utf-8')
             return data[key]
         return ''
 
-    def clean_up(self):
-        os.system('rm ./*.csv')
-
-vi = VariationImport(sampleData)
-vi.run()
+if __name__ == "__main__":
+    main()
