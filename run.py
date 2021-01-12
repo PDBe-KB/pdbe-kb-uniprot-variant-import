@@ -1,8 +1,8 @@
 import json
 import glob
 from uniprot_variant_import import get_data, variation_import
+from uniprot_variant_import.constants import *
 
-SIFTS_URL_TO_MAPPING = 'ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/uniprot_pdb.tsv.gz'
 
 # TODO add argument support for clean run
 
@@ -22,7 +22,7 @@ def main(clean=False):
     Get the latest UniProt mapping from SIFTS and
     retrieve all the JSONs with the variation data
     """
-    gd = get_data.GetData(SIFTS_URL_TO_MAPPING)
+    gd = get_data.GetData(SIFTS_URL_TO_MAPPING, 'data')
     gd.make_folder()
     gd.get_file()
     gd.extract()
