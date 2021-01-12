@@ -7,7 +7,7 @@ import csv
 
 SIFTS_URL_TO_MAPPING = 'ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/tsv/uniprot_pdb.tsv.gz'
 
-def main():
+def main(clean=False):
     """
     This function:
     1.) Downloads the lastest SIFTS mappings
@@ -25,7 +25,7 @@ def main():
     gd.make_folder()
     gd.get_file()
     gd.extract()
-    gd.get_jsons()
+    gd.get_jsons(clean)
 
     """
     Convert the variation data JSONs files to
@@ -64,7 +64,10 @@ class GetData(object):
         print('Extracting mapping file...')
         os.system('gunzip %s.gz' % self.mapping_file_name)
 
-    def get_jsons(self):
+    def get_jsons(self, clean):
+        if clean:
+            # Remove all the previous JSON files if clean is set to True
+            os.system('rm data/*.json')
         with open(self.mapping_file_name) as mapping_file:
             file_count = 0
             for line in mapping_file:
@@ -171,7 +174,7 @@ class VariationImport(object):
 
     def value_or_null(self, data, key):
         if data and key in data.keys():
-            if type(data[key]) is unicode:
+            if type(data[key]) is 'unicode':
                 data[key] = data[key].encode('utf-8')
             return data[key]
         return ''
