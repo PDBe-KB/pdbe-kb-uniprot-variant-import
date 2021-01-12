@@ -9,6 +9,15 @@ SIFTS_URL_TO_MAPPING = 'ftp://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/ts
 
 def main():
     """
+    This function:
+    1.) Downloads the lastest SIFTS mappings
+    2.) Downloads all the new UniProt data files using the UniProt API
+    3.) Converts the variant data from the UniProt .json files into .csv format
+    :return: None
+    """
+
+    print('\nSTARTING UNIPROT VARIANT RETRIEVAL AND CONVERSION')
+    """
     Get the latest UniProt mapping from SIFTS and
     retrieve all the JSONs with the variation data
     """
@@ -23,6 +32,7 @@ def main():
     CSV files for loading into PDBe-KB graph
     database
     """
+    print("Converting JSON files to CSV...")
     for json_path in glob.glob('data/*.json'):
         with open(json_path) as json_file:
             try:
@@ -31,6 +41,7 @@ def main():
                 vi.run()
             except:
                 continue
+    print("DONE\n")
             
 
 class GetData(object):
@@ -40,11 +51,14 @@ class GetData(object):
         self.mapping_file_name = 'uniprot.tsv'
 
     def make_folder(self):
-        os.system('mkdir data')
+        if not(glob.glob('data')):
+            os.system('mkdir data')
 
     def get_file(self):
+        print('Removing old SIFTS mapping file...')
+        os.system('rm %s' % self.mapping_file_name)
         print('Getting latest SIFTS mapping file...')
-        os.system('curl %s > %s.gz' % (self.url, self.mapping_file_name))
+        os.system('curl -s %s > %s.gz' % (self.url, self.mapping_file_name))
 
     def extract(self):
         print('Extracting mapping file...')
@@ -52,16 +66,16 @@ class GetData(object):
 
     def get_jsons(self):
         with open(self.mapping_file_name) as mapping_file:
-            line_count = 0
+            file_count = 0
             for line in mapping_file:
                 if not line.startswith('#') and not line.startswith('SP_PRIMARY'):
-                    line_count += 1
                     accession = line.split()[0]
-                    os.system('curl -s https://www.ebi.ac.uk/proteins/api/variation/%s > data/%s.json' % (
-                        accession.strip(),
-                        accession.strip()))
-                    if line_count % 1000 == 0:
-                        print('Retrieved %i JSONs' % line_count)
+                    if not (glob.glob('data/%s.json' % accession.strip())):
+                        file_count += 1
+                        os.system('curl -s https://www.ebi.ac.uk/proteins/api/variation/%s > data/%s.json' % (
+                            accession.strip(),
+                            accession.strip()))
+            print("Retrieved %i new JSONs" % file_count)
 
 
 class VariationImport(object):
