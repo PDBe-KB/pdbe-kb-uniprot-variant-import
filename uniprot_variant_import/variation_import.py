@@ -1,8 +1,11 @@
 import csv
 
+# TODO add progress % output
+# TODO move the file name strings into constants.py
+# TODO add docstrings
+# TODO add comments
 
 class VariationImport(object):
-    # TODO add progress % output
 
     def __init__(self, data):
         self.data = data
