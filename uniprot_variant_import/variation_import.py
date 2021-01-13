@@ -114,7 +114,7 @@ class VariationImport(object):
                 flat_evidence = {}
                 if 'source' in evidence.keys():
                     flat_evidence = evidence['source']
-                flat_evidence['code'] = self.encoded_value_or_null(evidence, 'code')
+                flat_evidence['code'] = self.value_or_null(evidence, 'code')
                 self.save_to_file(flat_evidence, evidence_id, self.evidence_keys, self.evidence_csv_path)
                 self.save_to_rels_file(variant_id, evidence_id, self.unp_assoc_evidence_csv_path)
         return evidences_count
@@ -132,7 +132,7 @@ class VariationImport(object):
         csv_writer = csv.writer(csv_file, dialect='excel')
         row = [identifier]
         for key in key_list:
-            row.append(self.encoded_value_or_null(data, key))
+            row.append(self.value_or_null(data, key))
         csv_writer.writerow(row)
         csv_file.close()
 
@@ -149,15 +149,13 @@ class VariationImport(object):
         csv_writer.writerow((x, y))
         csv_file.close()
 
-    def encoded_value_or_null(self, data, key):
+    def value_or_null(self, data, key):
         """
-        Checks if there is data for a given key and changes encoding if necessary
+        Checks if there is data for a given key
         :param data: Dict; a sub-dictionary of the UniProt data
         :param key: String; a key
-        :return: String; UTF-8 encoded string or ''
+        :return: String; the value or ''
         """
         if data and key in data.keys():
-            if type(data[key]) is 'unicode':
-                data[key] = data[key].encode('utf-8')
-            return data[key]
+            return str(data[key])
         return ''

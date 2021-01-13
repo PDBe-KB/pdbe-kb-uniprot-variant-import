@@ -36,12 +36,12 @@ class TestVariationImport(TestCase):
 
     def test_encoded_value_or_null(self):
         # Check if the correct values are returned
-        self.assertEqual(self.vi.encoded_value_or_null({'foo': 'bar'}, 'foo'), 'bar')
-        self.assertEqual(self.vi.encoded_value_or_null({'foo': 'bar'}, 'asd'), '')
-        self.assertEqual(self.vi.encoded_value_or_null(None, 'foo'), '')
+        self.assertEqual(self.vi.value_or_null({'foo': 'bar'}, 'foo'), 'bar')
+        self.assertEqual(self.vi.value_or_null({'foo': 'bar'}, 'asd'), '')
+        self.assertEqual(self.vi.value_or_null(None, 'foo'), '')
         mock = u'text'
         # Check if it gets rid of unicode
-        self.assertEqual(self.vi.encoded_value_or_null({'foo': mock}, 'foo'), 'text')
+        self.assertEqual(self.vi.value_or_null({'foo': mock}, 'foo'), 'text')
 
     def test_run(self):
         self.vi.save_to_file = lambda a, b, c, d: None
@@ -85,7 +85,7 @@ class TestVariationImport(TestCase):
             self.vi.read_evidences(0, {'evidences': [{'code': 'foo'}, {'code': 'bar'}, {'source': {}}]}, 'id'), 3)
 
     def test_save_to_file(self):
-        self.vi.encoded_value_or_null = lambda a, b: a[b]
+        self.vi.value_or_null = lambda a, b: a[b]
         # Check if correctly writes out all the required key values
         self.vi.save_to_file({'foo': 'bar', 'asd': 'sad'}, 'id', ['foo'], 'mock.save')
         with open('mock.save') as mock_file:
