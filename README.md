@@ -20,10 +20,17 @@ Clone this repository
 ```
 git clone https://github.com/PDBe-KB/pdbe-kb-uniprot-variant-import.git
 ```
-Run the process
+Run the process with only downloading new UniProt JSON files:
 ```
 python3 run.py
 ```
+Or with downloading all the JSON files (i.e. removing old files):
+```shell script
+python3 run.py --clean
+# OR
+python3 run.py -c
+```
+
 1.) This will first download and unzip the latest SIFTS mapping via the URL defined in "SIFTS_URL_TO_MAPPING".
 
 2.) Next, it will extract all the UniProt accessions from the mapping file

@@ -1,5 +1,7 @@
 import json
 import glob
+import sys
+import getopt
 from datetime import datetime as dt
 from uniprot_variant_import import get_data, variation_import
 from uniprot_variant_import.constants import *
@@ -49,4 +51,18 @@ def main(clean=False):
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "c", ["clean"])
+    except getopt.GetoptError as err:
+        print(err)
+        sys.exit()
+
+    clean = False
+
+    for o, a in opts:
+        if o in ("-c", "--clean"):
+            clean = True
+        else:
+            assert False, "unhandled option"
+
+    main(clean=clean)
