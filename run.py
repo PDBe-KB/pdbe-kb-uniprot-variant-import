@@ -1,5 +1,6 @@
 import json
 import glob
+from datetime import datetime as dt
 from uniprot_variant_import import get_data, variation_import
 from uniprot_variant_import.constants import *
 
@@ -33,7 +34,7 @@ def main(clean=False):
     database
     """
 
-    print("Converting JSON files to CSV...")
+    print(dt.now(), "Converting JSON files to CSV...")
 
     for json_path in glob.glob('data/*.json'):
         with open(json_path) as json_file:
