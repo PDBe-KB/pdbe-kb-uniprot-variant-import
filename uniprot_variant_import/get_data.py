@@ -1,5 +1,6 @@
 import os
 import glob
+from datetime import datetime as dt
 from uniprot_variant_import.constants import *
 
 
@@ -37,9 +38,9 @@ class GetData(object):
         Get the latest SIFTS mapping file
         :return: None
         """
-        print('Removing old SIFTS mapping file...')
+        print(dt.now(), 'Removing old SIFTS mapping file...')
         os.system('rm %s' % self.mapping_file_name)
-        print('Getting latest SIFTS mapping file...')
+        print(dt.now(), 'Getting latest SIFTS mapping file...')
         os.system('curl -s %s > %s.gz' % (self.url, self.mapping_file_name))
 
     def extract(self):
@@ -47,7 +48,7 @@ class GetData(object):
         Extract the SIFTS mapping file
         :return: None
         """
-        print('Extracting mapping file...')
+        print(dt.now(), 'Extracting mapping file...')
         os.system('gunzip %s.gz' % self.mapping_file_name)
 
     def get_jsons(self, clean):
@@ -56,6 +57,7 @@ class GetData(object):
         :param clean: Boolean; if set to True, remove all the previous json files from self.path_to_data
         :return: None
         """
+        accessions = []
         if clean:
             # Remove all the previous JSON files if clean is set to True
             os.system('rm %s/*.json' % self.path_to_data)
@@ -64,11 +66,14 @@ class GetData(object):
             for line in mapping_file:
                 if not line.startswith('#') and not line.startswith('SP_PRIMARY'):
                     accession = line.split()[0]
-                    if not (glob.glob('%s/%s.json' % (self.path_to_data, accession.strip()))):
-                        file_count += 1
-                        os.system('curl -s %s/%s > %s/%s.json' % (
-                            UNIPROT_API_URL,
-                            accession.strip(),
-                            self.path_to_data,
-                            accession.strip()))
-            print("Retrieved %i new JSONs" % file_count)
+                    accessions.append(accession.strip())
+        print(dt.now(), "Extracted %i UniProt accessions" % len(accessions))
+        for i in range(len(accessions)):
+            if not (glob.glob('%s/%s.json' % (self.path_to_data, accessions[i]))):
+                file_count += 1
+                os.system('curl -s %s/%s > %s/%s.json' % (
+                    UNIPROT_API_URL,
+                    accessions[i],
+                    self.path_to_data,
+                    accessions[i]))
+        print(dt.now(), "Downloaded %i new JSONs" % file_count)

@@ -1,7 +1,8 @@
 import csv
+from datetime import datetime as dt
+from uniprot_variant_import.constants import *
 
 # TODO add progress % output
-# TODO move the file name strings into constants.py
 # TODO add docstrings
 # TODO add comments
 
@@ -9,16 +10,16 @@ class VariationImport(object):
 
     def __init__(self, data):
         self.data = data
-        self.unp_variant_csv_path = './UNP_Variant.csv'
-        self.xref_csv_path = './UNP_Variant_Xref.csv'
-        self.evidence_csv_path = './UNP_Variant_Evidence.csv'
-        self.association_csv_path = './UNP_Association.csv'
-        self.unp_unp_variant_csv_path = './UNP_UNP_Variant_Rels.csv'
-        self.unp_variant_xref_csv_path = './UNP_Variant_Xref_Rels.csv'
-        self.unp_variant_association_csv_path = './UNP_Variant_Association_Rels.csv'
-        self.unp_variant_evidence_csv_path = './UNP_Variant_Evidence_Rels.csv'
-        self.unp_assoc_xref_csv_path = './UNP_Association_Xref_Rels.csv'
-        self.unp_assoc_evidence_csv_path = './UNP_Association_Evidence_Rels.csv'
+        self.unp_variant_csv_path = UNP_VARIANT_CSV_PATH
+        self.xref_csv_path = UNP_XREF_CSV_PATH
+        self.evidence_csv_path = UNP_EVIDENCE_CSV_PATH
+        self.association_csv_path = UNP_ASSOCIATION_CSV_PATH
+        self.unp_unp_variant_csv_path = UNP_UNP_VARIANT_CSV_PATH
+        self.unp_variant_xref_csv_path = UNP_VARIANT_XREF_CSV_PATH
+        self.unp_variant_association_csv_path = UNP_VARIANT_ASSOCIATION_CSV_PATH
+        self.unp_variant_evidence_csv_path = UNP_VARIANT_EVIDENCE_CSV_PATH
+        self.unp_assoc_xref_csv_path = UNP_ASSOCIATION_XREF_CSV_PATH
+        self.unp_assoc_evidence_csv_path = UNP_ASSOCIATION_EVIDENCE_CSV_PATH
         self.xref_keys = ['name', 'id', 'url', 'alternativeUrl']
         self.unp_variant_keys = ['type', 'description', 'alternativeSequence',
                                  'begin', 'end', 'wildType', 'polyphenPrediction',
