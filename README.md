@@ -1,10 +1,8 @@
 # PDBe-KB Variant Importer
 
-`TODO add codeclimate badge`
-
-`TODO add codecoverage badge`
-
-`TODO add travid badge`
+[![Build Status](https://travis-ci.com/PDBe-KB/pdbe-kb-uniprot-variant-import.svg?branch=master)](https://travis-ci.com/PDBe-KB/pdbe-kb-uniprot-variant-import)
+[![codecov](https://codecov.io/gh/PDBe-KB/pdbe-kb-uniprot-variant-import/branch/master/graph/badge.svg?token=y3ECW921dY)](https://codecov.io/gh/PDBe-KB/pdbe-kb-uniprot-variant-import)
+[![Maintainability](https://api.codeclimate.com/v1/badges/0d310eccab1721310e31/maintainability)](https://codeclimate.com/github/PDBe-KB/pdbe-kb-uniprot-variant-import/maintainability)
 
 ## Basic information
 `TODO`
