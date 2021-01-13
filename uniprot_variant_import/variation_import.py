@@ -1,6 +1,7 @@
 import csv
 from uniprot_variant_import.constants import *
 
+
 class VariationImport(object):
     """
     This object is responsible for parsing the data from a JSON file that is in

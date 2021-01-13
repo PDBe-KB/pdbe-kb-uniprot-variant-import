@@ -6,7 +6,6 @@ from datetime import datetime as dt
 from uniprot_variant_import import get_data, variation_import
 from uniprot_variant_import.constants import *
 
-# TODO add argument support for clean run using getops or sys.argv
 
 def main(clean=False):
     """
