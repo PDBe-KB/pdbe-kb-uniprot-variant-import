@@ -93,12 +93,20 @@ class VariationImport(object):
         :param rels_path: String; used for getting the path to the relevant CSV - Note: there are 2 different CSVs
         :return: Int; the count of xrefs in the data
         """
+        data_array = None
         if 'xrefs' in data.keys():
-            for xref in data['xrefs']:
-                xref_count += 1
-                xref_id = 'xref_%s_%s' % (variant_id, xref_count)
-                self.save_to_file(xref, xref_id, self.xref_keys, self.xref_csv_path)
-                self.save_to_rels_file(variant_id, xref_id, rels_path)
+            data_array = data['xrefs']
+        elif 'dbReferences' in data.keys():
+            data_array = data['dbReferences']
+
+        if not data_array:
+            return
+
+        for xref in data_array:
+            xref_count += 1
+            xref_id = 'xref_%s_%s' % (variant_id, xref_count)
+            self.save_to_file(xref, xref_id, self.xref_keys, self.xref_csv_path)
+            self.save_to_rels_file(variant_id, xref_id, rels_path)
         return xref_count
 
     def read_evidences(self, evidences_count, data, variant_id, rels_path):

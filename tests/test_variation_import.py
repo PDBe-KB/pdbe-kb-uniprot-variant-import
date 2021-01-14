@@ -71,8 +71,9 @@ class TestVariationImport(TestCase):
         self.vi.save_to_rels_file = lambda a, b, c: None
         # Check if correctly counts xrefs
         self.assertEqual(self.vi.read_xrefs({'xrefs': ['foo', 'bar']}, 'asd', 0, 'path'), 2)
+        self.assertEqual(self.vi.read_xrefs({'dbReferences': ['foo', 'bar']}, 'asd', 0, 'path'), 2)
         # Check if correctly handles missing xrefs
-        self.assertEqual(self.vi.read_xrefs({'asd': ['foo', 'bar']}, 'asd', 0, 'path'), 0)
+        self.assertEqual(self.vi.read_xrefs({'asd': ['foo', 'bar']}, 'asd', 0, 'path'), None)
 
     def test_read_evidences(self):
         self.vi.save_to_file = lambda a, b, c, d: None
