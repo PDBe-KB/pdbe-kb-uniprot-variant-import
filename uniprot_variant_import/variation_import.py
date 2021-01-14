@@ -53,8 +53,8 @@ class VariationImport(object):
             variant_id = 'var_%s_%s' % (accession, feature_count)
             self.save_to_rels_file(accession, variant_id, self.unp_unp_variant_csv_path)
             self.save_to_file(feature, variant_id, self.unp_variant_keys, self.unp_variant_csv_path)
-            xref_count = self.read_xrefs(feature, variant_id, xref_count)
-            evidences_count = self.read_evidences(evidences_count, feature, variant_id)
+            xref_count = self.read_xrefs(feature, variant_id, xref_count, self.unp_variant_xref_csv_path)
+            evidences_count = self.read_evidences(evidences_count, feature, variant_id, self.unp_variant_evidence_csv_path)
             evidences_count, xref_count = self.read_associations(association_count, evidences_count, feature,
                                                                  variant_id, xref_count)
         return feature_count
@@ -79,17 +79,18 @@ class VariationImport(object):
                 # Save all the data items from the association dictionary
                 self.save_to_file(association, association_id, self.association_keys, self.association_csv_path)
                 # Update the count of xrefs (used for generating identifiers)
-                xref_count = self.read_xrefs(association, association_id, xref_count)
+                xref_count = self.read_xrefs(association, association_id, xref_count, self.unp_assoc_xref_csv_path)
                 # Update the count of evidences (used for generating identifiers)
-                evidences_count = self.read_evidences(evidences_count, association, association_id)
+                evidences_count = self.read_evidences(evidences_count, association, association_id, self.unp_assoc_evidence_csv_path)
         return evidences_count, xref_count
 
-    def read_xrefs(self, data, variant_id, xref_count):
+    def read_xrefs(self, data, variant_id, xref_count, rels_path):
         """
         Parses the xref sub-dictionary of the data and saves the information to files
         :param data: Dict; sub-dictionary with the xref data
         :param variant_id: String; used for generating unique identifiers
         :param xref_count: Int; used for generating unique identifiers
+        :param rels_path: String; used for getting the path to the relevant CSV - Note: there are 2 different CSVs
         :return: Int; the count of xrefs in the data
         """
         if 'xrefs' in data.keys():
@@ -97,15 +98,16 @@ class VariationImport(object):
                 xref_count += 1
                 xref_id = 'xref_%s_%s' % (variant_id, xref_count)
                 self.save_to_file(xref, xref_id, self.xref_keys, self.xref_csv_path)
-                self.save_to_rels_file(variant_id, xref_id, self.unp_variant_xref_csv_path)
+                self.save_to_rels_file(variant_id, xref_id, rels_path)
         return xref_count
 
-    def read_evidences(self, evidences_count, data, variant_id):
+    def read_evidences(self, evidences_count, data, variant_id, rels_path):
         """
         Parses the evidences sub-dictionary of the data and saves the information to files
         :param evidences_count: Int; used for generating unique identifiers
         :param data: Dict; sub-dictionary with the evidences data
         :param variant_id: String; used for generating unique identifiers
+        :param rels_path: String; used for getting the path to the relevant CSV - Note: there are 2 different CSVs
         :return: Int; the count of evidences in the data
         """
         if 'evidences' in data.keys():
@@ -117,7 +119,7 @@ class VariationImport(object):
                     flat_evidence = evidence['source']
                 flat_evidence['code'] = self.value_or_null(evidence, 'code')
                 self.save_to_file(flat_evidence, evidence_id, self.evidence_keys, self.evidence_csv_path)
-                self.save_to_rels_file(variant_id, evidence_id, self.unp_assoc_evidence_csv_path)
+                self.save_to_rels_file(variant_id, evidence_id, rels_path)
         return evidences_count
 
     def save_to_file(self, data, identifier, key_list, csv_path):

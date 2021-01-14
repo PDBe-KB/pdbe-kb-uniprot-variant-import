@@ -46,8 +46,8 @@ class TestVariationImport(TestCase):
     def test_run(self):
         self.vi.save_to_file = lambda a, b, c, d: None
         self.vi.save_to_rels_file = lambda a, b, c: None
-        self.vi.read_xrefs = lambda a, b, c: 1
-        self.vi.read_evidences = lambda a, b, c: 2
+        self.vi.read_xrefs = lambda a, b, c, d: 1
+        self.vi.read_evidences = lambda a, b, c, d: 2
         self.vi.read_associations = lambda a, b, c, d, e: (1, 2)
         self.vi.data = {'accession': 'asd', 'features': ['foo', 'bar']}
         # Check if correctly counts features
@@ -59,8 +59,8 @@ class TestVariationImport(TestCase):
     def test_read_associations(self):
         self.vi.save_to_file = lambda a, b, c, d: None
         self.vi.save_to_rels_file = lambda a, b, c: None
-        self.vi.read_xrefs = lambda a, b, c: 1
-        self.vi.read_evidences = lambda a, b, c: 2
+        self.vi.read_xrefs = lambda a, b, c, d: 1
+        self.vi.read_evidences = lambda a, b, c, d: 2
         # Check if it returns the output of read_xrefs and read_evidences
         self.assertEqual(self.vi.read_associations(0, 0, {'association': ['foo', 'bar']}, 0, 0), (2, 1))
         # Check if it handles missing data
@@ -70,19 +70,19 @@ class TestVariationImport(TestCase):
         self.vi.save_to_file = lambda a, b, c, d: None
         self.vi.save_to_rels_file = lambda a, b, c: None
         # Check if correctly counts xrefs
-        self.assertEqual(self.vi.read_xrefs({'xrefs': ['foo', 'bar']}, 'asd', 0), 2)
+        self.assertEqual(self.vi.read_xrefs({'xrefs': ['foo', 'bar']}, 'asd', 0, 'path'), 2)
         # Check if correctly handles missing xrefs
-        self.assertEqual(self.vi.read_xrefs({'asd': ['foo', 'bar']}, 'asd', 0), 0)
+        self.assertEqual(self.vi.read_xrefs({'asd': ['foo', 'bar']}, 'asd', 0, 'path'), 0)
 
     def test_read_evidences(self):
         self.vi.save_to_file = lambda a, b, c, d: None
         self.vi.save_to_rels_file = lambda a, b, c: None
         # Check is correctly counts evidences
-        self.assertEqual(self.vi.read_evidences(0, {'evidences': [{'code': 'foo'}, {'code': 'bar'}]}, 'id'), 2)
+        self.assertEqual(self.vi.read_evidences(0, {'evidences': [{'code': 'foo'}, {'code': 'bar'}]}, 'id', 'path'), 2)
         # Check if correctly handles missing evidences
-        self.assertEqual(self.vi.read_evidences(0, {'foo': [{'code': 'foo'}, {'code': 'bar'}]}, 'id'), 0)
+        self.assertEqual(self.vi.read_evidences(0, {'foo': [{'code': 'foo'}, {'code': 'bar'}]}, 'id', 'path'), 0)
         self.assertEqual(
-            self.vi.read_evidences(0, {'evidences': [{'code': 'foo'}, {'code': 'bar'}, {'source': {}}]}, 'id'), 3)
+            self.vi.read_evidences(0, {'evidences': [{'code': 'foo'}, {'code': 'bar'}, {'source': {}}]}, 'id', 'path'), 3)
 
     def test_save_to_file(self):
         self.vi.value_or_null = lambda a, b: a[b]
